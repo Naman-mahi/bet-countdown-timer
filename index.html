@@ -1,10 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+  <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Countdown 😎</title>
-<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<meta name="description" content="Enjoy betting with your friends on various sports, events, and games. Set up friendly competitions, track scores, and have fun together.">
+<meta name="keywords" content="betting, bet with friends, friendly betting, sports betting, friendly competition">
+<meta name="author" content="Namanmahi">
+<meta name="robots" content="index, follow">
+<meta name="revisit-after" content="7 days">
+<meta name="generator" content="Your HTML Editor">
+<meta name="theme-color" content="#4CAF50">
+<meta property="og:title" content="Bet with Friends">
+<meta property="og:description" content="Enjoy betting with your friends on various sports, events, and games. Set up friendly competitions, track scores, and have fun together.">
+<title>Bet with Friends</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 <style>
   .countdown-box {
     border-radius: 10px;
@@ -24,6 +33,10 @@
     font-size: 18px;
     margin-top: 10px;
     color: #4a5568; /* Gray */
+  }
+
+  .red-text {
+    color: #f56565; /* Red */
   }
 </style>
 </head>
@@ -92,6 +105,38 @@
     document.getElementById("minutes").innerHTML = minutes.toString().padStart(2, '0');
     document.getElementById("seconds").innerHTML = seconds.toString().padStart(2, '0');
     document.getElementById("milliseconds").innerHTML = milliseconds.toString().padStart(3, '0');
+
+    // Change text color to red if count is zero for any unit
+    if (months == 0) {
+      document.getElementById("months").classList.add('red-text');
+    } else {
+      document.getElementById("months").classList.remove('red-text');
+    }
+    if (days == 0) {
+      document.getElementById("days").classList.add('red-text');
+    } else {
+      document.getElementById("days").classList.remove('red-text');
+    }
+    if (hours == 0) {
+      document.getElementById("hours").classList.add('red-text');
+    } else {
+      document.getElementById("hours").classList.remove('red-text');
+    }
+    if (minutes == 0) {
+      document.getElementById("minutes").classList.add('red-text');
+    } else {
+      document.getElementById("minutes").classList.remove('red-text');
+    }
+    if (seconds == 0) {
+      document.getElementById("seconds").classList.add('red-text');
+    } else {
+      document.getElementById("seconds").classList.remove('red-text');
+    }
+    if (milliseconds == 0) {
+      document.getElementById("milliseconds").classList.add('red-text');
+    } else {
+      document.getElementById("milliseconds").classList.remove('red-text');
+    }
   }, 1); // Update every millisecond
 </script>
 </body>
