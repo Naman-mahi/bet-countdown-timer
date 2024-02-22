@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Countdown 😎</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<style>
+  .countdown-box {
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    background-color: #f7fafc; /* Light Gray */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .countdown-number {
+    font-size: 48px;
+    font-weight: bold;
+    color: #2d3748; /* Dark Gray */
+  }
+
+  .countdown-label {
+    font-size: 18px;
+    margin-top: 10px;
+    color: #4a5568; /* Gray */
+  }
+</style>
+</head>
+<body class="bg-gray-900 text-white h-screen flex justify-center items-center">
+<div class="text-center">
+  <h1 class="text-4xl font-bold mb-4">Countdown for Bet 😎</h1>
+  <div id="timer" class="grid grid-cols-2 gap-4">
+    <div class="countdown-box">
+      <div id="months" class="countdown-number">00</div>
+      <div class="countdown-label">Months</div>
+    </div>
+    <div class="countdown-box">
+      <div id="days" class="countdown-number">00</div>
+      <div class="countdown-label">Days</div>
+    </div>
+    <div class="countdown-box">
+      <div id="hours" class="countdown-number">00</div>
+      <div class="countdown-label">Hours</div>
+    </div>
+    <div class="countdown-box">
+      <div id="minutes" class="countdown-number">00</div>
+      <div class="countdown-label">Minutes</div>
+    </div>
+    <div class="countdown-box">
+      <div id="seconds" class="countdown-number">00</div>
+      <div class="countdown-label">Seconds</div>
+    </div>
+    <div class="countdown-box">
+      <div id="milliseconds" class="countdown-number">000</div>
+      <div class="countdown-label">Milliseconds</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Set the target date for the countdown (change as needed)
+  const targetDate = new Date("2024-03-04T00:00:00").getTime();
+
+  // Update the countdown every millisecond
+  const timerInterval = setInterval(() => {
+    // Get the current date and time
+    const now = new Date().getTime();
+
+    // Calculate the remaining time
+    const distance = targetDate - now;
+
+    // Check if the target date has passed
+    if (distance < 0) {
+      clearInterval(timerInterval);
+      document.getElementById("timer").innerHTML = "Countdown expired!";
+      return;
+    }
+
+    // Calculate months, days, hours, minutes, seconds, and milliseconds
+    const months = Math.floor(distance / (1000 * 60 * 60 * 24 * 30));
+    const days = Math.floor((distance % (1000 * 60 * 60 * 24 * 30)) / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    const milliseconds = Math.floor(distance % 1000);
+
+    // Display the countdown
+    document.getElementById("months").innerHTML = months.toString().padStart(2, '0');
+    document.getElementById("days").innerHTML = days.toString().padStart(2, '0');
+    document.getElementById("hours").innerHTML = hours.toString().padStart(2, '0');
+    document.getElementById("minutes").innerHTML = minutes.toString().padStart(2, '0');
+    document.getElementById("seconds").innerHTML = seconds.toString().padStart(2, '0');
+    document.getElementById("milliseconds").innerHTML = milliseconds.toString().padStart(3, '0');
+  }, 1); // Update every millisecond
+</script>
+</body>
+</html>
