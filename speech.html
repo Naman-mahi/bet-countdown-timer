@@ -1,32 +1,83 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-   <title>Speech to text</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video to Text</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-   <body>
-      <div class="speaker" style="display: flex;justify-content: space-between;width: 13rem;box-shadow: 0 0 13px #0000003d;border-radius: 5px;">
-         <p id="action" style="color: grey;font-weight: 800; padding: 0; padding-left: 2rem;"></p>
-         <button onclick="runSpeechRecog()" style="border: transparent;padding: 0 0.5rem;">
-            Speech
-         </button>
+<body>
+  <div class="container mt-5">
+    <h1 class="mb-4">Video to Text Converter</h1>
+    <div class="row">
+      <div class="col">
+        <video id="videoElement" width="400" controls></video>
       </div>
-      <h3 id="output" class="hide"></h3>
-      <script>
-         runSpeechRecog = () => {
-            document.getElementById("output").innerHTML = "Loading text...";
-            var output = document.getElementById('output');
-            var action = document.getElementById('action');
-            let recognization = new webkitSpeechRecognition();
-            recognization.onstart = () => {
-               action.innerHTML = "Listening...";
-            }
-            recognization.onresult = (e) => {
-               var transcript = e.results[0][0].transcript;
-               output.innerHTML = transcript;
-               output.classList.remove("hide")
-               action.innerHTML = "";
-            }
-            recognization.start();
-         }
-      </script>
-   </body>
+    </div>
+    <div class="row mt-3">
+      <div class="col">
+        <button id="convertBtn" class="btn btn-primary">Convert to Text</button>
+      </div>
+    </div>
+    <div class="row mt-3">
+      <div class="col">
+        <h3>Converted Text:</h3>
+        <p id="convertedText"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS and Dependencies -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+
+  <script>
+    // Get video element
+    const videoElement = document.getElementById('videoElement');
+    // Get button element
+    const convertBtn = document.getElementById('convertBtn');
+    // Get paragraph element to display converted text
+    const convertedText = document.getElementById('convertedText');
+
+    // Function to start capturing video from camera
+    async function startVideo() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        videoElement.srcObject = stream;
+      } catch (err) {
+        console.error('Error accessing camera:', err);
+      }
+    }
+
+    // Function to stop capturing video
+    function stopVideo() {
+      const stream = videoElement.srcObject;
+      const tracks = stream.getTracks();
+
+      tracks.forEach(function(track) {
+        track.stop();
+      });
+
+      videoElement.srcObject = null;
+    }
+
+    // Event listener for convert button click
+    convertBtn.addEventListener('click', async () => {
+      const speechRecognition = new webkitSpeechRecognition();
+      speechRecognition.lang = 'en-US';
+
+      speechRecognition.onresult = function(event) {
+        const resultIndex = event.resultIndex;
+        const transcript = event.results[resultIndex][0].transcript;
+        convertedText.textContent = transcript;
+      };
+
+      speechRecognition.start();
+    });
+
+    // Start capturing video when page loads
+    startVideo();
+  </script>
+</body>
 </html>
