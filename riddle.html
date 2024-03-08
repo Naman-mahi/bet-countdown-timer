@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Riddle Game</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f3f4f6;
+      font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', cursive;
+    }
+
+    #riddle {
+      background-color: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+    }
+
+    #hint {
+      color: #6b7280;
+    }
+
+    #result {
+      color: #d53f8c;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+
+    #timer {
+      color: #4f46e5;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .fun-font {
+      font-family: 'Indie Flower', cursive;
+    }
+  </style>
+</head>
+<body class="p-8">
+  <div class="max-w-xl mx-auto">
+    <h1 class="text-3xl font-bold mb-8 text-center fun-font">🤔 Riddle Game 🤔</h1>
+    <div id="riddle" class="mb-8">
+      <h2 class="text-2xl font-semibold mb-4 text-center" id="question">Question</h2>
+      <p class="text-center text-xl text-lg mb-4 hidden" id="hint"></p>
+      <div class="text-center text-xl hidden" id="result"></div>
+    </div>
+    <p id="timer" class="text-lg font-bold mb-8 text-center">Time remaining: 30 seconds</p>
+    <div class="flex justify-center">
+      <button id="startButton" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        Start Game
+      </button>
+      <button id="nextButton" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 mx-2 rounded hidden">
+        Next Question
+      </button>
+    </div>
+  </div>
+
+  <script>
+   const riddles = [
+  {
+    question: "What has a bed but never sleeps?",
+    hint: "It has a riverbed.",
+    answer: "river"
+  },
+  {
+    question: "What can you catch but not throw?",
+    hint: "It's not a pleasant catch.",
+    answer: "cold"
+  },
+  {
+    question: "What has one eye but can't see?",
+    hint: "It helps in sewing.",
+    answer: "needle"
+  },
+  {
+    question: "What can travel around the world while staying in a corner?",
+    hint: "It goes on envelopes.",
+    answer: "stamp"
+  },
+  {
+    question: "What has a head, a tail, but no body?",
+    hint: "It's something you flip to make decisions.",
+    answer: "coin"
+  },
+  {
+    question: "What gets smaller as you use it?",
+    hint: "It gets shorter as you write.",
+    answer: "pencil"
+  },
+  {
+    question: "What belongs to you but is used more by others?",
+    hint: "People often call you by it.",
+    answer: "name"
+  },
+  {
+    question: "What has keys but can't open locks?",
+    hint: "You're probably using it right now!",
+    answer: "keyboard"
+  },
+  {
+    question: "What can you hold without ever touching it?",
+    hint: "You engage in it verbally.",
+    answer: "conversation"
+  },
+  {
+    question: "What goes up but never comes down?",
+    hint: "It keeps increasing.",
+    answer: "age"
+  },
+  {
+    question: "What has hands but can't clap?",
+    hint: "It tells you the time.",
+    answer: "clock"
+  },
+  {
+    question: "What has a neck but no head?",
+    hint: "You drink from it.",
+    answer: "bottle"
+  },
+  {
+    question: "What can you break, even if you never pick it up or touch it?",
+    hint: "Keep your word!",
+    answer: "promise"
+  },
+  {
+    question: "What has eyes but can't see?",
+    hint: "It's a vegetable.",
+    answer: "potato"
+  },
+  {
+    question: "What starts with the letter 't', is filled with 't', and ends with 't'?",
+    hint: "It's a vessel for brewing tea.",
+    answer: "teapot"
+  },
+  {
+    question: "What comes once in a minute, twice in a moment, but never in a thousand years?",
+    hint: "Pay attention to the wording.",
+    answer: "m"
+  },
+  {
+    question: "What can you break, even if you never pick it up or touch it?",
+    hint: "Keep your word!",
+    answer: "promise"
+  },
+  {
+    question: "What has many keys but can't open any locks?",
+    hint: "It makes beautiful music.",
+    answer: "piano"
+  },
+  {
+    question: "What is full of holes but still holds water?",
+    hint: "It's handy for cleaning.",
+    answer: "sponge"
+  },
+  {
+    question: "What gets wetter as it dries?",
+    hint: "It's something you use after a shower.",
+    answer: "towel"
+  }
+];
+
+
+     const members = ["Amir", "Bala", "Mudassir", "Sai Kiran"]; // Add more member names as needed
+
+    // Function to shuffle an array
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    // Shuffle the member names array
+    shuffleArray(members);
+
+    let currentRiddleIndex = -1; // Initialize to -1 to start from the first question
+    let timer;
+    let timeLeft = 30;
+    let countdown;
+
+    const questionElem = document.getElementById('question');
+    const hintElem = document.getElementById('hint');
+    const timerElem = document.getElementById('timer');
+    const resultElem = document.getElementById('result');
+    const startButton = document.getElementById('startButton');
+    const nextButton = document.getElementById('nextButton');
+
+    function displayRiddle() {
+      currentRiddleIndex++;
+      if (currentRiddleIndex === riddles.length) {
+        // Game over
+        questionElem.textContent = "Game Over!";
+        hintElem.textContent = "";
+        timerElem.textContent = "";
+        resultElem.textContent = "";
+        clearInterval(timer); // Clear the timer
+        return;
+      }
+
+      // Display the assigned member's name with the question
+      const assignedMember = riddles[currentRiddleIndex].assignedMember;
+     questionElem.innerHTML = `Question for <span class="text-pink-600">${assignedMember}</span>: ${riddles[currentRiddleIndex].question}`;
+      hintElem.textContent = riddles[currentRiddleIndex].hint;
+    }
+
+    function startCountdown() {
+      let count = 3;
+      countdown = setInterval(() => {
+        if (count === 0) {
+          clearInterval(countdown);
+          startTimer();
+          return;
+        }
+        timerElem.textContent = `Game starts in: ${count}`;
+        count--;
+      }, 1000);
+    }
+
+    function startTimer() {
+      timeLeft = 30;
+      timerElem.textContent = `Time remaining: ${timeLeft} seconds`;
+      timer = setInterval(() => {
+        timeLeft--;
+        timerElem.textContent = `Time remaining: ${timeLeft} seconds`;
+
+        if (timeLeft === 15) {
+          hintElem.classList.remove('hidden');
+        }
+
+        if (timeLeft === 0) {
+          clearInterval(timer);
+          resultElem.textContent = "Time's up! The answer was: " + riddles[currentRiddleIndex].answer;
+          resultElem.classList.remove('hidden');
+          nextButton.classList.remove('hidden');
+        }
+      }, 1000);
+    }
+
+    // Assign questions to members
+    shuffleArray(riddles);
+    for (let i = 0; i < riddles.length; i++) {
+      const memberIndex = i % members.length;
+      riddles[i].assignedMember = members[memberIndex];
+    }
+
+    // Attach event listener to start button
+    startButton.addEventListener('click', () => {
+      displayRiddle();
+      startCountdown();
+      startButton.disabled = true;
+    });
+
+    // Attach event listener to next button
+    nextButton.addEventListener('click', () => {
+      nextButton.classList.add('hidden');
+      resultElem.classList.add('hidden');
+      hintElem.classList.add('hidden');
+      displayRiddle();
+      startCountdown();
+    });
+  </script>
+</body>
+</html>
