@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hypnotic Animation</title>
+    <!-- Include Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .circle-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw; /* Full viewport width */
+            height: 100vh; /* Full viewport height */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000000;
+        }
+        .circle {
+            position: absolute;
+            width: 8px;
+            height: 9px;
+            border-radius: 50%;
+            opacity: 0;
+            animation: circleAnimation 3s linear forwards infinite;
+        }
+
+        @keyframes circleAnimation {
+            0% {
+                opacity: 1;
+                transform: translate(10, 10) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(calc(var(--x) * 1vw), calc(var(--y) * 1vh)) rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="circle-container" id="circle-container">
+    </div>
+    
+    <script>
+        // Function to generate random number between min and max
+        function getRandomNumber(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        // Function to generate random color
+        function getRandomColor() {
+            var letters = '0123456789ABCDEF';
+            var color = '#';
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        // Create circles dynamically
+        var container = document.getElementById('circle-container');
+        for (var i = 0; i < 200; i++) {
+            var circle = document.createElement('div');
+            circle.className = 'circle';
+            circle.style.setProperty('--x', getRandomNumber(-99, 79));
+            circle.style.setProperty('--y', getRandomNumber(-89, 95));
+            circle.style.backgroundColor = getRandomColor();
+            circle.style.animationDelay = getRandomNumber(0, 10) + 's';
+            container.appendChild(circle);
+        }
+    </script>
+</body>
+
+</html>
