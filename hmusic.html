@@ -21,8 +21,8 @@
         }
         .circle {
             position: absolute;
-            width: 8px;
-            height: 9px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
             opacity: 0;
             animation: circleAnimation 5s linear forwards infinite;
@@ -63,7 +63,7 @@
 
         // Create circles dynamically
         var container = document.getElementById('circle-container');
-        for (var i = 0; i < 500; i++) {
+        for (var i = 0; i < 200; i++) {
             var circle = document.createElement('div');
             circle.className = 'circle';
             circle.style.setProperty('--x', getRandomNumber(-99, 79));
@@ -75,7 +75,7 @@
 
         // Autoplay background music
         window.onload = function() {
-            var audio = new Audio('20.mp3');
+            var audio = new Audio('https://naman-mahi.github.io/bet-countdown-timer/20.mp3');
             audio.play();
         };
 
