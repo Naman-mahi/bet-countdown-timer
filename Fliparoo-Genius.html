@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fliparoo Genius</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body {
+            background-color: #f3f4f6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-reverse {
+            background-color: #6366f1;
+            color: #fff;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-reverse:hover {
+            background-color: #4f52e5;
+        }
+
+        .btn-copy {
+            background-color: #d1d5db;
+            color: #4b5563;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-copy:hover {
+            background-color: #cbd5e1;
+        }
+    </style>
+</head>
+
+<body class="flex items-center justify-center h-screen">
+    <div class="w-full max-w-md p-8 bg-white rounded-lg shadow-md card">
+        <h1 class="text-2xl font-bold mb-4 text-center">Fliparoo Genius</h1>
+        <div>
+            <label for="input" class="block text-sm font-medium text-gray-700">Input Text:</label>
+            <textarea id="input" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" rows="3"></textarea>
+        </div>
+        <div class="mt-4">
+            <button onclick="reverseAndDisplay()" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 btn-reverse w-full">Reverse</button>
+        </div>
+        <div class="mt-4">
+            <label for="output" class="block text-sm font-medium text-gray-700">Output:</label>
+            <textarea id="output" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" rows="3" readonly></textarea>
+        </div>
+        <div class="mt-4">
+            <button onclick="copyOutput()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 btn-copy w-full">Copy Output</button>
+        </div>
+    </div>
+
+    <script>
+        function reverseAndDisplay() {
+            let input = document.getElementById('input').value;
+            let output = reverseString(input);
+            document.getElementById('output').value = output;
+        }
+
+        function reverseString(input) {
+            // Remove whitespace
+            let trimmedInput = input.replace(/\s/g, '');
+
+            // Convert to uppercase
+            let uppercaseString = trimmedInput.toUpperCase();
+
+            // Reverse the string
+            let reversedString = uppercaseString.split('').reverse().join('');
+
+            return reversedString;
+        }
+
+       function copyOutput() {
+    let output = document.getElementById('output');
+    output.select();
+    document.execCommand('copy');
+
+    // Show SweetAlert message
+    Swal.fire({
+        icon: 'success',
+        title: 'copied!',
+        timer: 2000, // Display for 2 seconds
+        showConfirmButton: false
+    });
+}
+
+    </script>
+</body>
+
+</html>
