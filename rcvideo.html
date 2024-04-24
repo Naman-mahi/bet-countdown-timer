@@ -13,8 +13,7 @@
       <div class="col-md-6">
         <p>
           Click the "Start Recording" button to begin video recording for up to 2 minutes.
-          You can stop recording by clicking the "Stop Recording" button. The "Download"
-          button will download the recorded video.
+          You can stop recording by clicking the "Stop Recording" button.
         </p>
         <br />
 
@@ -29,6 +28,7 @@
         <div class="text-center mb-3">
           <button id="startButton" class="btn btn-primary">Start Recording</button>
           <button id="stopButton" class="btn btn-danger d-none">Stop Recording</button>
+          <button id="previewButton" class="btn btn-info d-none">Preview Video</button>
           <a id="downloadButton" class="btn btn-success d-none">Download</a>
         </div>
         <div id="log"></div>
@@ -42,6 +42,7 @@
     let preview = document.getElementById("preview");
     let startButton = document.getElementById("startButton");
     let stopButton = document.getElementById("stopButton");
+    let previewButton = document.getElementById("previewButton");
     let downloadButton = document.getElementById("downloadButton");
     let logElement = document.getElementById("log");
 
@@ -94,6 +95,9 @@
           log(
             `Successfully recorded ${recordedBlob.size} bytes of ${recordedBlob.type} media.`,
           );
+
+          previewButton.classList.remove("d-none");
+          downloadButton.classList.remove("d-none");
         };
 
         mediaRecorder.start();
@@ -101,6 +105,7 @@
         startButton.classList.add("d-none");
         stopButton.classList.remove("d-none");
         downloadButton.classList.add("d-none");
+        previewButton.classList.add("d-none");
         recordingContainer.classList.remove("d-none");
         videoContainer.classList.remove("d-none");
 
@@ -117,6 +122,7 @@
         startButton.classList.remove("d-none");
         stopButton.classList.add("d-none");
         downloadButton.classList.remove("d-none");
+        previewButton.classList.remove("d-none");
         recordingContainer.classList.add("d-none");
         videoContainer.classList.add("d-none");
       }
@@ -128,6 +134,10 @@
 
     stopButton.addEventListener("click", () => {
       stopRecording();
+    });
+
+    previewButton.addEventListener("click", () => {
+      preview.play();
     });
   </script>
 </body>
