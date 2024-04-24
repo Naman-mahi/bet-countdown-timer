@@ -31,10 +31,7 @@
           <button id="stopButton" class="btn btn-danger d-none">Stop Recording</button>
           <a id="downloadButton" class="btn btn-success d-none">Download</a>
         </div>
-
-        <div class="bottom">
-          <pre id="log"></pre>
-        </div>
+        <div id="log"></div>
       </div>
     </div>
   </div>
@@ -57,7 +54,7 @@
     let isRecording = false;
 
     function log(msg) {
-      logElement.innerHTML += `${msg}\n`;
+      logElement.innerHTML += `${msg}<br>`;
     }
 
     function startCountdown() {
@@ -89,8 +86,9 @@
 
         mediaRecorder.onstop = () => {
           let recordedBlob = new Blob(recordedChunks, { type: "video/webm" });
-          preview.src = URL.createObjectURL(recordedBlob);
-          downloadButton.href = preview.src;
+          let videoURL = URL.createObjectURL(recordedBlob);
+          preview.src = videoURL;
+          downloadButton.href = videoURL;
           downloadButton.download = "RecordedVideo.webm";
 
           log(
