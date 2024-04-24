@@ -12,24 +12,24 @@
     <div class="row justify-content-center">
       <div class="col-md-6">
         <p>
-          Click the "Start Recording" button to begin video recording for a few seconds.
+          Click the "Start Recording" button to begin video recording for up to 2 minutes.
           You can stop recording by clicking the "Stop Recording" button. The "Download"
-          button will download the received data (although it's in a raw, unwrapped form
-          that isn't very useful).
+          button will download the recorded video.
         </p>
         <br />
 
-        <div class="left">
-          <div id="startButton" class="btn btn-primary mb-3">Start Recording</div>
-          <h2>Preview</h2>
-          <video id="preview" width="160" height="120" autoplay muted></video>
+        <div id="recordingContainer" class="text-center d-none mb-3">
+          <h2 id="countdown"></h2>
         </div>
 
-        <div class="right">
-          <div id="stopButton" class="btn btn-danger mb-3">Stop Recording</div>
-          <h2>Recording</h2>
-          <video id="recording" width="160" height="120" controls></video>
-          <a id="downloadButton" class="btn btn-success mb-3">Download</a>
+        <div id="videoContainer" class="d-none">
+          <video id="preview" width="320" height="240" autoplay muted></video>
+        </div>
+
+        <div class="text-center mb-3">
+          <button id="startButton" class="btn btn-primary">Start Recording</button>
+          <button id="stopButton" class="btn btn-danger d-none">Stop Recording</button>
+          <a id="downloadButton" class="btn btn-success d-none">Download</a>
         </div>
 
         <div class="bottom">
@@ -43,83 +43,93 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     let preview = document.getElementById("preview");
-    let recording = document.getElementById("recording");
     let startButton = document.getElementById("startButton");
     let stopButton = document.getElementById("stopButton");
     let downloadButton = document.getElementById("downloadButton");
     let logElement = document.getElementById("log");
 
-    let recordingTimeMS = 5000;
+    let countdownElement = document.getElementById("countdown");
+    let recordingContainer = document.getElementById("recordingContainer");
+    let videoContainer = document.getElementById("videoContainer");
+
+    let mediaRecorder;
+    let recordedChunks = [];
+    let isRecording = false;
 
     function log(msg) {
       logElement.innerHTML += `${msg}\n`;
     }
 
-    function wait(delayInMS) {
-      return new Promise((resolve) => setTimeout(resolve, delayInMS));
-    }
-
-    function startRecording(stream, lengthInMS) {
-      let recorder = new MediaRecorder(stream);
-      let data = [];
-
-      recorder.ondataavailable = (event) => data.push(event.data);
-      recorder.start();
-      log(`${recorder.state} for ${lengthInMS / 1000} seconds…`);
-
-      let stopped = new Promise((resolve, reject) => {
-        recorder.onstop = resolve;
-        recorder.onerror = (event) => reject(event.name);
-      });
-
-      let recorded = wait(lengthInMS).then(() => {
-        if (recorder.state === "recording") {
-          recorder.stop();
+    function startCountdown() {
+      let count = 3;
+      countdownElement.textContent = count;
+      let countdownInterval = setInterval(() => {
+        count--;
+        countdownElement.textContent = count;
+        if (count <= 0) {
+          clearInterval(countdownInterval);
+          startRecording();
         }
-      });
-
-      return Promise.all([stopped, recorded]).then(() => data);
+      }, 1000);
     }
 
-    function stop(stream) {
-      stream.getTracks().forEach((track) => track.stop());
-    }
+    function startRecording() {
+      navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      }).then((stream) => {
+        preview.srcObject = stream;
+        mediaRecorder = new MediaRecorder(stream);
 
-    startButton.addEventListener("click", () => {
-      navigator.mediaDevices
-        .getUserMedia({
-          video: true,
-          audio: true,
-        })
-        .then((stream) => {
-          preview.srcObject = stream;
-          downloadButton.href = stream;
-          preview.captureStream =
-            preview.captureStream || preview.mozCaptureStream;
-          return new Promise((resolve) => (preview.onplaying = resolve));
-        })
-        .then(() => startRecording(preview.captureStream(), recordingTimeMS))
-        .then((recordedChunks) => {
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            recordedChunks.push(event.data);
+          }
+        };
+
+        mediaRecorder.onstop = () => {
           let recordedBlob = new Blob(recordedChunks, { type: "video/webm" });
-          recording.src = URL.createObjectURL(recordedBlob);
-          downloadButton.href = recording.src;
+          preview.src = URL.createObjectURL(recordedBlob);
+          downloadButton.href = preview.src;
           downloadButton.download = "RecordedVideo.webm";
 
           log(
             `Successfully recorded ${recordedBlob.size} bytes of ${recordedBlob.type} media.`,
           );
-        })
-        .catch((error) => {
-          if (error.name === "NotFoundError") {
-            log("Camera or microphone not found. Can't record.");
-          } else {
-            log(error);
-          }
-        });
+        };
+
+        mediaRecorder.start();
+        isRecording = true;
+        startButton.classList.add("d-none");
+        stopButton.classList.remove("d-none");
+        downloadButton.classList.add("d-none");
+        recordingContainer.classList.remove("d-none");
+        videoContainer.classList.remove("d-none");
+
+        setTimeout(stopRecording, 120000); // Stop recording after 2 minutes
+      }).catch((error) => {
+        log(`Error accessing media devices: ${error}`);
+      });
+    }
+
+    function stopRecording() {
+      if (isRecording) {
+        mediaRecorder.stop();
+        isRecording = false;
+        startButton.classList.remove("d-none");
+        stopButton.classList.add("d-none");
+        downloadButton.classList.remove("d-none");
+        recordingContainer.classList.add("d-none");
+        videoContainer.classList.add("d-none");
+      }
+    }
+
+    startButton.addEventListener("click", () => {
+      startCountdown();
     });
 
     stopButton.addEventListener("click", () => {
-      stop(preview.srcObject);
+      stopRecording();
     });
   </script>
 </body>
