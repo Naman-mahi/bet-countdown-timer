@@ -19,11 +19,12 @@
         <br />
 
         <div id="recordingContainer" class="text-center d-none mb-3">
-          <h2 id="countdown"></h2>
+          <h2 id="countdown">3</h2>
         </div>
 
         <div id="videoContainer" class="d-none">
           <video id="preview" width="320" height="240" autoplay muted></video>
+          <h2 id="timer">2:00</h2>
         </div>
 
         <div class="text-center mb-3">
@@ -49,12 +50,14 @@
     let logElement = document.getElementById("log");
 
     let countdownElement = document.getElementById("countdown");
+    let timerElement = document.getElementById("timer");
     let recordingContainer = document.getElementById("recordingContainer");
     let videoContainer = document.getElementById("videoContainer");
 
     let mediaRecorder;
     let recordedChunks = [];
     let isRecording = false;
+    let recordingTime = 120; // 2 minutes in seconds
 
     function log(msg) {
       logElement.innerHTML += `${msg}\n`;
@@ -62,14 +65,13 @@
 
     function startCountdown() {
       let count = 3;
-      countdownElement.textContent = count;
       let countdownInterval = setInterval(() => {
-        count--;
         countdownElement.textContent = count;
         if (count <= 0) {
           clearInterval(countdownInterval);
           startRecording();
         }
+        count--;
       }, 1000);
     }
 
@@ -106,7 +108,15 @@
         recordingContainer.classList.remove("d-none");
         videoContainer.classList.remove("d-none");
 
-        setTimeout(stopRecording, 120000); // Stop recording after 2 minutes
+        // Update timer every second
+        let timerInterval = setInterval(() => {
+          timerElement.textContent = formatTime(recordingTime);
+          if (recordingTime <= 0) {
+            clearInterval(timerInterval);
+            stopRecording();
+          }
+          recordingTime--;
+        }, 1000);
       }).catch((error) => {
         log(`Error accessing media devices: ${error}`);
       });
@@ -122,6 +132,12 @@
         recordingContainer.classList.add("d-none");
         videoContainer.classList.add("d-none");
       }
+    }
+
+    function formatTime(seconds) {
+      let minutes = Math.floor(seconds / 60);
+      let remainingSeconds = seconds % 60;
+      return `${minutes.toString().padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
     }
 
     startButton.addEventListener("click", () => {
