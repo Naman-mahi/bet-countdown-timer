@@ -33,6 +33,14 @@
       background-color: #563d7c;
       border-color: #563d7c;
     }
+    .btn-preview {
+      background-color: #007bff;
+      border-color: #007bff;
+    }
+    .btn-preview:hover {
+      background-color: #0056b3;
+      border-color: #0056b3;
+    }
   </style>
 </head>
 <body>
@@ -51,6 +59,8 @@
                   <button id="startButton" class="btn btn-record">Start Recording</button>
                   <button id="stopButton" class="btn btn-stop d-none">Stop Recording</button>
                   <a id="downloadButton" class="btn btn-success d-none">Download</a>
+                  <button id="previewButton" class="btn btn-preview d-none">Preview</button>
+                  <button id="rerecordButton" class="btn btn-record d-none">Record Again</button>
                 </div>
                 <div id="recordingContainer" class="text-center d-none mb-3">
                   <h4 class="text-danger">Recording...</h4>
@@ -76,10 +86,13 @@
     let startButton = document.getElementById("startButton");
     let stopButton = document.getElementById("stopButton");
     let downloadButton = document.getElementById("downloadButton");
+    let previewButton = document.getElementById("previewButton");
+    let rerecordButton = document.getElementById("rerecordButton");
     let recordingContainer = document.getElementById("recordingContainer");
     let timerContainer = document.getElementById("timerContainer");
     let timerDisplay = document.getElementById("timer");
     let logElement = document.getElementById("log");
+    let recordedChunks = [];
 
     let countdownTime = 3; // Countdown time in seconds
     let recordingTimeMS = 60000; // 1 minute in milliseconds
@@ -101,26 +114,18 @@
 
     function startRecording(stream) {
       let recorder = new MediaRecorder(stream);
-      let data = [];
 
-      recorder.ondataavailable = (event) => data.push(event.data);
+      recorder.ondataavailable = (event) => recordedChunks.push(event.data);
       recorder.start();
       log(`Recording started for ${recordingTimeMS / 1000} seconds...`);
-
-      let stopped = new Promise((resolve, reject) => {
-        recorder.onstop = resolve;
-        recorder.onerror = (event) => reject(event.name);
-      });
 
       setTimeout(() => {
         recorder.stop();
         stopButton.classList.add("d-none");
-        downloadButton.classList.remove("d-none");
+        previewButton.classList.remove("d-none");
         timerContainer.classList.add("d-none");
         log(`Recording stopped after ${recordingTimeMS / 1000} seconds.`);
       }, recordingTimeMS);
-
-      return Promise.all([stopped]).then(() => data);
     }
 
     function stop(stream) {
@@ -137,7 +142,6 @@
         })
         .then(() => {
           startButton.classList.add("d-none");
-          stopButton.classList.remove("d-none");
           recordingContainer.classList.remove("d-none");
           timerContainer.classList.remove("d-none");
           startCountdown();
@@ -153,6 +157,24 @@
 
     stopButton.addEventListener("click", () => {
       stop(preview.srcObject);
+    });
+
+    previewButton.addEventListener("click", () => {
+      preview.src = URL.createObjectURL(new Blob(recordedChunks, { type: "video/webm" }));
+      preview.controls = true;
+      downloadButton.href = preview.src;
+      downloadButton.classList.remove("d-none");
+      previewButton.classList.add("d-none");
+      rerecordButton.classList.remove("d-none");
+    });
+
+    rerecordButton.addEventListener("click", () => {
+      recordedChunks = [];
+      preview.src = "";
+      downloadButton.href = "";
+      preview.controls = false;
+      rerecordButton.classList.add("d-none");
+      startButton.classList.remove("d-none");
     });
   </script>
 </body>
