@@ -80,6 +80,8 @@
     let timerContainer = document.getElementById("timerContainer");
     let timerDisplay = document.getElementById("timer");
     let logElement = document.getElementById("log");
+    let mediaRecorder;
+    let recordedChunks = [];
 
     let recordingTimeMS = 120000; // 2 minutes
 
@@ -88,27 +90,28 @@
     }
 
     function startRecording(stream) {
-      let recorder = new MediaRecorder(stream);
-      let data = [];
+      mediaRecorder = new MediaRecorder(stream);
 
-      recorder.ondataavailable = (event) => data.push(event.data);
-      recorder.start();
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          recordedChunks.push(event.data);
+        }
+      };
+
+      mediaRecorder.start();
       log(`Recording started for ${recordingTimeMS / 1000} seconds...`);
 
-      let stopped = new Promise((resolve, reject) => {
-        recorder.onstop = resolve;
-        recorder.onerror = (event) => reject(event.name);
-      });
-
       setTimeout(() => {
-        recorder.stop();
-        stopButton.classList.add("d-none");
-        downloadButton.classList.remove("d-none");
-        timerContainer.classList.add("d-none");
-        log(`Recording stopped after ${recordingTimeMS / 1000} seconds.`);
+        stopRecording();
       }, recordingTimeMS);
+    }
 
-      return Promise.all([stopped]).then(() => data);
+    function stopRecording() {
+      mediaRecorder.stop();
+      stopButton.classList.add("d-none");
+      downloadButton.classList.remove("d-none");
+      timerContainer.classList.add("d-none");
+      log(`Recording stopped after ${recordingTimeMS / 1000} seconds.`);
     }
 
     function stop(stream) {
@@ -133,7 +136,10 @@
           let timerInterval = setInterval(() => {
             remainingTime--;
             timerDisplay.textContent = formatTime(remainingTime);
-            if (remainingTime <= 0) clearInterval(timerInterval);
+            if (remainingTime <= 0) {
+              clearInterval(timerInterval);
+              stopRecording();
+            }
           }, 1000);
         })
         .catch((error) => {
@@ -147,6 +153,8 @@
 
     stopButton.addEventListener("click", () => {
       stop(preview.srcObject);
+      clearInterval(timerInterval);
+      stopRecording();
     });
 
     function formatTime(seconds) {
